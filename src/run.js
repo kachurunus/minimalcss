@@ -451,7 +451,13 @@ const minimalcss = async (options) => {
     for (const pageUrl of urls) {
       const page = await browser.newPage();
       if (!enableServiceWorkers) {
-        await page._client.send('ServiceWorker.disable');
+        await page.evaluate(() => {
+          navigator.serviceWorker?.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+              registration.unregister();
+            })
+          })
+        });
       }
       try {
         await processPage({
